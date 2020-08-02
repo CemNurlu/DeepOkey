@@ -1,126 +1,101 @@
-from random import randrange
-
+import tile
+import board
+import random.choice
 
 class Game:
-    """All functions necessary for the game, core of the project."""
-    
-    #TODO:Add OpenAI Gym Integration
+    """
+    Main Game class for starting and initializing the game.
 
-    
+
+    #ARGUEMENTS
+
+        ended: Boolean, game continue state.
+
+        tilelist: List, list for storing of not in use tile objects
+
+        decklist: List, list for storing deck objects
+
+
+
+
+    #FUNCTIONS
+
+        generate_tiles: Makes tiles.
+            Input: None
+            Output: List of Tile objects
+
+
+
+        generate_decks: Removes tiles from tilelist and add them to decks in decklist.
+            Input: None
+            Output: List of Deck objects
+
+        generate_joker
+            Input: None
+            Output: Tile object
+
+    """
+
+
+
     def __init__(self):
-        
-        self.all_tiles, self.joker, self.decks =  self.generate()
-        
-        self.turn = 0
-        
-        self.throwntiles =[[] for i in range(4)]
+        self.game_end = False
+        self.tilelist = self.generate_tiles()
+        self.decklist = self.generate_decks()
+        self.joker = self.generate_joker()
 
-    def generate(self):
+    def generate_tiles():
+        _tiles = []
+        for colour in range(4):
+            for number in range(1,14):
+                 # Generate 2 tiles and add both to the tiles list
+                 tiles.extend(Tile(colour,number),Tile(colour,number))
+        return(_tiles)
 
-        
+    def generate_decks():
+        _decklist = []
 
-        """
-        4 Suits,
-        13 Numbers
-        1 Fake
-        x2 deck
-        Fake is original Joker(Not added as not needed to remove)
-        Joker is any tile
-        """
-
-        """
-        17bit number to represent each tile
-        First 4 Numbers Suit, 13 After is Number
-        Joker is all 1 bits
-        """
-        all_tiles=[]
-        
-        #Generate Joker:
-        for i in range(2):
-            all_tiles.append((2 ** 17) - 1)
-            joker = [randrange(4),randrange(13)]
-
-        #Not Effective but lazy and ok implemantation to generate deck
-        #TODO:Fix this.
-        for _ in range(2):
-            for i in range(4):
-                for j in range(13):
-                    t = (2 ** (13+i)) + (2 **j)
-                    all_tiles.append(t)
-                    
-        
-        
-        #Generate Hands of each player
-        decks = []
+        # Generate decks and add the tiles
         for i in range(4):
-            deck = []
-            for _ in range(14):
-                t = all_tiles.pop(randrange(len(all_tiles)))
-                deck.append(t)
-            
-            #player 1 who starts gets an extra tile
-            if (i==0):
-                t = all_tiles.pop(randrange(len(all_tiles)))
-                deck.append(t)
-            decks.append(deck)
-        
-        
-        return all_tiles,joker,decks
-    
-    #TODO: FIX THIS.
-    def throw(self,thrownTile,playerid):
-        tile = self.decks[playerid].pop(thrownTile)
-        self.throwntiles[playerid+1].append(tile)
-        
-    
-    def take(self,take,playerid):
-        DoTake = take
-        
-        if DoTake == True:
-            self.decks[playerid].append(self.throwntiles[playerid].pop(-1))
+            _decklist.append(Deck(i+1,[]))
+
+        # Move tiles
+        for i in range(4):
+            #First player gets 1 tile more
+            if i = 0:
+                tilecount = 15
+            else:
+                tilecount = 14
+
+            for j in range(tilecount):
+                #Pick a tile at random
+                tile = random.choice(self.tilelist)
+
+                # Add it to the deck
+                tile.append(_decklist[i])
+
+                # Remove it from the tilelist
+                self.tilelist.remove(tile)
+
+        return(_decklist)
+
+
+    # IDEA: should generate_joker function return tile object or list?
+    def generate_joker():
+        tile = random.choice(self.tilelist)
+
+        # Add it to the deck
+
+        # Remove it from the tilelist
+        # FIXME: Not sure if this actually works, never ran the code yet, will have to check and fix or make sure.
+        if tile.number = 13:
+            next_number = 1
         else:
-            x = randrange(len(self.all_tiles))
-            self.decks[playerid].append(self.all_tiles[x])
-            self.all_tiles.remove(x)
-        self.showstate(playerid)
-            
-    
-    
-    def action(self,playerid, throw=0, take=0):
-        if (self.turn == 1):
-            #Only throw, no take! shorturl.at/blqBO
-            self.throw(throw,playerid)
-        else:
-            #Take, see what you took, and throw
-            print(self.take(take,playerid))
-            
-            throw = int(input("throw?"))
-            
-            self.throw(throw,playerid)
-        self.turn +=1
-            
-            
-    def showstate(self,playerid):
-        return {"playerid":playerid,
-                "deck": self.decks[playerid],
-                "GroundTiles": self.throwntiles,
-                "joker": self.joker,
-                "turn": self.turn
-                }
-    
-    #TODO: do next turn!
-        
-game = Game()
-print(game.showstate(1))
-i = game.showstate(1)["deck"]
-for k in i:
-    print(bin(k))
+            next_number = tile.number + 1
 
 
-#TODO: Human interpreter for binary to suit and number
-#TODO: Inputs to Turns
-    
-            
-        
+        self.tilelist.remove(tile)
 
+        joker = Tile(tile.colour,next_number)
 
+        return(joker)
