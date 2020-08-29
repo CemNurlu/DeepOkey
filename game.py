@@ -1,6 +1,6 @@
-import tile
-import board
-import random.choice
+from Tile import Tile
+from Deck import Deck
+import random
 
 class Game:
     """
@@ -44,15 +44,15 @@ class Game:
         self.decklist = self.generate_decks()
         self.joker = self.generate_joker()
 
-    def generate_tiles():
+    def generate_tiles(self):
         _tiles = []
         for colour in range(4):
             for number in range(1,14):
                  # Generate 2 tiles and add both to the tiles list
-                 tiles.extend(Tile(colour,number),Tile(colour,number))
+                 _tiles.extend([Tile(colour,number),Tile(colour,number)])
         return(_tiles)
 
-    def generate_decks():
+    def generate_decks(self):
         _decklist = []
 
         # Generate decks and add the tiles
@@ -62,7 +62,7 @@ class Game:
         # Move tiles
         for i in range(4):
             #First player gets 1 tile more
-            if i = 0:
+            if i == 0:
                 tilecount = 15
             else:
                 tilecount = 14
@@ -72,7 +72,7 @@ class Game:
                 tile = random.choice(self.tilelist)
 
                 # Add it to the deck
-                tile.append(_decklist[i])
+                _decklist[i].append(tile)
 
                 # Remove it from the tilelist
                 self.tilelist.remove(tile)
@@ -81,14 +81,14 @@ class Game:
 
 
     # IDEA: should generate_joker function return tile object or list?
-    def generate_joker():
+    def generate_joker(self):
         tile = random.choice(self.tilelist)
 
         # Add it to the deck
 
         # Remove it from the tilelist
         # FIXME: Not sure if this actually works, never ran the code yet, will have to check and fix or make sure.
-        if tile.number = 13:
+        if tile.number == 13:
             next_number = 1
         else:
             next_number = tile.number + 1
@@ -99,3 +99,8 @@ class Game:
         joker = Tile(tile.colour,next_number)
 
         return(joker)
+
+g = Game()
+for tile in g.tilelist:
+    print(tile.colour, tile.number)
+print(g.joker)
