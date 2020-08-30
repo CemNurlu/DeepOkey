@@ -7,9 +7,9 @@ class Game:
     Main Game class for starting and initializing the game.
 
 
-    #ARGUEMENTS
+    #ARGUMENTS
 
-        ended: Boolean, game continue state.
+        game_end: Boolean, game continue state.
 
         tilelist: List, list for storing of not in use tile objects
 
@@ -41,9 +41,10 @@ class Game:
     def __init__(self):
         self.game_end = False
         self.tilelist = self.generate_tiles()
+        self.generate_joker()
         self.decklist = self.generate_decks()
-        self.joker = self.generate_joker()
-
+        
+    # --INITIALIZATIONS FOR THE GAME--
     def generate_tiles(self):
         _tiles = []
         for colour in range(4):
@@ -56,8 +57,8 @@ class Game:
         _decklist = []
 
         # Generate decks and add the tiles
-        for i in range(4):
-            _decklist.append(Deck(i+1,[]))
+        for i in range(1,5):
+            _decklist.append(Deck(i,[]))
 
         # Move tiles
         for i in range(4):
@@ -80,27 +81,36 @@ class Game:
         return(_decklist)
 
 
-    # IDEA: should generate_joker function return tile object or list?
     def generate_joker(self):
-        tile = random.choice(self.tilelist)
-
-        # Add it to the deck
-
-        # Remove it from the tilelist
-        # FIXME: Not sure if this actually works, never ran the code yet, will have to check and fix or make sure.
-        if tile.number == 13:
-            next_number = 1
+        #generate joker
+        joker_colour = random.choice(range(0,4))
+        joker_number = random.choice(range(1,14))
+        
+        #Add joker to the tiles
+        self.tilelist.extend([Tile(joker_colour, joker_number,is_joker = True),
+                             Tile(joker_colour, joker_number,is_joker = True)])
+        
+        #Find the tile opened to the ground and remove it
+        if joker_number == 13:
+            opened_tile_number = 1
         else:
-            next_number = tile.number + 1
+            opened_tile_number = joker_number + 1
+        
+        
+        for i in self.tilelist:
+            if i.colour == joker_colour and i.number == opened_tile_number:
+                self.tilelist.remove(i) ##TODO: Maybe later save this to a position for visualization?
+                break
+        
+        # --GAME ACTIONS--
+        class action():
+            def throw_tile(self,tile):
+                pass
+        
+        # --STATE FUNCTIONS--
+        def read_state(self,playernumber):
+            pass
+        
+            
+            
 
-
-        self.tilelist.remove(tile)
-
-        joker = Tile(tile.colour,next_number)
-
-        return(joker)
-
-g = Game()
-for tile in g.tilelist:
-    print(tile.colour, tile.number)
-print(g.joker)
